@@ -36,7 +36,7 @@ class NaverNewsSearchService:
         self.headers = {
             "X-Naver-Client-Id": self.client_id,
             "X-Naver-Client-Secret": self.client_secret,
-            "User-Agent": "AI-Political-Columnist/1.0"
+            "User-Agent": "ai-news-columnist/1.0"
         }
     
     async def search_recent_news(

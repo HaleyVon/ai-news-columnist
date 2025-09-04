@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an AI-powered political columnist service built with FastAPI + Python, designed to generate balanced political columns using OpenAI GPT-4o-mini API. The service is optimized for AWS Lambda deployment and follows serverless architecture patterns.
+This is an AI-powered political columnist service built with FastAPI + Python, designed to generate balanced political columns using OpenAI gpt-4.1-mini API. The service is optimized for AWS Lambda deployment and follows serverless architecture patterns.
 
 ## Core Architecture
 

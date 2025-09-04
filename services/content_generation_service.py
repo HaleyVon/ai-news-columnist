@@ -1,6 +1,6 @@
 """
 컨텐츠 생성 서비스
-OpenAI GPT-4o-mini API를 사용하여 정치 컬럼을 생성하는 전용 모듈
+OpenAI gpt-4.1-mini API를 사용하여 정치 컬럼을 생성하는 전용 모듈
 """
 
 import logging
@@ -30,7 +30,7 @@ class ContentGenerationService:
         self.client = AsyncOpenAI(api_key=self.api_key)
         
         # 사용할 모델 설정
-        self.model = "gpt-4o-mini"
+        self.model = "gpt-4.1-mini"
         
         self.prompt_generator = PromptGenerator()
     
@@ -55,8 +55,14 @@ class ContentGenerationService:
             # 뉴스 데이터를 프롬프트용으로 포맷
             news_summary = self._format_news_for_prompt(news_data)
             
+            # 뉴스 소스 정보 추출
+            news_sources = [{
+                'title': item.get('title', 'N/A'),
+                'url': item.get('originalLink', item.get('link', '#'))
+            } for item in news_data[:10]]
+            
             # 뉴스 기반 컬럼 생성 프롬프트 생성
-            prompt = self.prompt_generator.get_draft_prompt_with_news(topic, news_summary)
+            prompt = self.prompt_generator.get_draft_prompt_with_news(topic, news_summary, news_sources)
             
             # OpenAI API 호출하여 컬럼 생성
             response = await self.client.chat.completions.create(
@@ -72,7 +78,7 @@ class ContentGenerationService:
                     }
                 ],
                 temperature=0.7,
-                max_tokens=3000
+                max_completion_tokens=3000
             )
             
             if not response.choices or not response.choices[0].message.content:
@@ -166,7 +172,11 @@ class ContentGenerationService:
                     found_title = True
                     continue
                 elif found_title and line and not line.startswith('#') and not line.startswith('## '):
-                    summary = line[:300] + "..." if len(line) > 300 else line
+                    # 300자 이내로 강제 제한 (초과 시 297자 + 말줄임표, 최종 <= 300)
+                    if len(line) > 300:
+                        summary = (line[:297]).rstrip() + "..."
+                    else:
+                        summary = line
                     break
             
             logger.info(f"제목/요약 추출 완료: {title}")

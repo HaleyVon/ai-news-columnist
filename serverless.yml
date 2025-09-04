@@ -1,7 +1,7 @@
 # Serverless Framework 설정 파일
 # AWS Lambda 배포를 위한 설정
 
-service: ai-political-columnist
+service: ai-news-columnist
 
 frameworkVersion: "3"
 

@@ -1,10 +1,10 @@
 # AI 정치 컬럼니스트 FastAPI 서비스
 
-OpenAI GPT-4o-mini API를 활용한 정치 컬럼 생성 서비스입니다. FastAPI + Python으로 구현되었으며, AWS Lambda에 최적화되어 있습니다.
+OpenAI gpt-4.1-mini API를 활용한 정치 컬럼 생성 서비스입니다. FastAPI + Python으로 구현되었으며, AWS Lambda에 최적화되어 있습니다.
 
 ## 🚀 주요 기능
 
-- **AI 기반 정치 컬럼 생성**: OpenAI GPT-4o-mini API를 활용한 고품질 컬럼 생성
+- **AI 기반 정치 컬럼 생성**: OpenAI gpt-4.1-mini API를 활용한 고품질 컬럼 생성
 - **다중 관점 분석**: 진보/보수 관점을 균형있게 반영
 - **품질 보증 시스템**: 자동 평가 및 반복 개선 프로세스
 - **RESTful API**: JSON 기반 API 엔드포인트 제공
@@ -23,7 +23,7 @@ OpenAI GPT-4o-mini API를 활용한 정치 컬럼 생성 서비스입니다. Fas
 ### 1. 저장소 클론
 ```bash
 git clone <repository-url>
-cd ai-political-columnist
+cd ai-news-columnist
 ```
 
 ### 2. 가상환경 생성 및 활성화
@@ -201,7 +201,7 @@ make status
 ## 🗂 프로젝트 구조
 
 ```
-ai-political-columnist/
+ai-news-columnist/
 ├── main.py                 # FastAPI 애플리케이션 메인 파일
 ├── schemas.py              # Pydantic 스키마 정의
 ├── requirements.txt        # Python 패키지 의존성

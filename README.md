@@ -1,6 +1,6 @@
 # 🏛️ AI 정치 컬럼니스트
 
-> OpenAI GPT-4o-mini API를 활용한 균형잡힌 정치 컬럼 생성 서비스  
+> OpenAI gpt-4.1-mini API를 활용한 균형잡힌 정치 컬럼 생성 서비스  
 > FastAPI + Python 기반, AWS Lambda 서버리스 아키텍처
 
 <div align="center">
@@ -29,7 +29,7 @@
 
 ## 🎯 프로젝트 개요
 
-AI 정치 컬럼니스트는 **OpenAI GPT-4o-mini API**를 활용하여 정치적 주제에 대해 균형잡힌 시각의 고품질 컬럼을 자동 생성하는 서비스입니다.
+AI 정치 컬럼니스트는 **OpenAI gpt-4.1-mini API**를 활용하여 정치적 주제에 대해 균형잡힌 시각의 고품질 컬럼을 자동 생성하는 서비스입니다.
 
 ### 🔥 핵심 특징
 - **균형잡힌 관점**: 진보/보수 양측 시각을 공정하게 반영
@@ -42,7 +42,7 @@ AI 정치 컬럼니스트는 **OpenAI GPT-4o-mini API**를 활용하여 정치�
 ## ✨ 주요 기능
 
 ### 🤖 AI 기반 컬럼 생성
-- OpenAI GPT-4o-mini 모델 활용
+- OpenAI gpt-4.1-mini 모델 활용
 - 다단계 품질 검증 프로세스
 - 자동 제목/요약 생성
 
@@ -83,8 +83,8 @@ AI 정치 컬럼니스트는 **OpenAI GPT-4o-mini API**를 활용하여 정치�
 
 ### 1️⃣ 저장소 클론
 ```bash
-git clone https://github.com/your-username/ai-political-columnist.git
-cd ai-political-columnist
+git clone https://github.com/your-username/ai-news-columnist.git
+cd ai-news-columnist
 ```
 
 ### 2️⃣ Python 가상환경 생성
@@ -451,7 +451,7 @@ make logs-prod
 ## 📁 프로젝트 구조
 
 ```
-ai-political-columnist/
+ai-news-columnist/
 ├── 📄 main.py                  # FastAPI 메인 애플리케이션
 ├── 📄 schemas.py               # Pydantic 데이터 모델 정의
 ├── 📄 requirements.txt         # Python 패키지 의존성

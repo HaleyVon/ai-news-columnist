@@ -11,6 +11,7 @@ class PromptGenerator:
     
     def __init__(self):
         """프롬프트 생성기 초기화"""
+        
         # 작성 규칙 정의
         self.writing_rules = """
 - 정치 초보자도 이해할 수 있는 쉬운 용어와 설명으로 작성.
@@ -21,16 +22,20 @@ class PromptGenerator:
 - 진보 진영 입장과 보수 진영 입장은 반드시 각각 3개의 bullet point로 구성해야 합니다. 각 bullet point는 '- '로 시작해야 하며, 반드시 줄바꿈으로 구분되어야 합니다.
 - 논리적 흐름이 자연스럽고, 주제를 이해하기에 정보가 충분해야 합니다.
 - 반드시 검색된 보도자료에 기반하여 편향되지 않은 서술을 유지하세요.
+- 컬럼 작성 시 참고한 뉴스 자료의 링크를 맨 마지막에 반드시 포함해야 합니다.
+- 진영 분류 시 다음 키워드를 참고하세요:
+  * 진보: 민주당, 더불어민주당, 조국혁신당, 정청래, 정의당, 조국, 여당, 이재명 등
+  * 보수: 국민의힘, 야당, 국힘, 이준석, 한동훈, 안철수, 개혁신당, 전한길, 장동혁, 나경원, 김문수, 윤석열 등
+ - 요약(첫 번째 요약 단락)은 최대 300자 이내로 작성하세요. 300자를 초과하지 마세요.
         """.strip()
         
         # 템플릿 정의 (마크다운 형식)
         self.template = """
 ## 주제를 잘 드러내며 흥미를 유발하는 중립적인 제목
 
-핵심 내용을 요약하여 300~400자 내외
+핵심 내용을 요약하여 최대 300자 이내로 간결하게 작성
 
-## 💬 진영별 입장
-### {topic}에 대한 진영별 입장
+## 💬 ((핵심 주제))에 대한 진영별 입장
 
 ### 🔵 진보 진영 입장
 - (첫 번째 핵심 입장)
@@ -42,15 +47,26 @@ class PromptGenerator:
 - (두 번째 핵심 입장)
 - (세 번째 핵심 입장)
 
-## 🧨 내용
+## 🧨 흥미를 유발하는 중립적인 대제목
 ### 주제의 핵심 쟁점을 다루는 소제목
 
 해당 주제에서 핵심이 되는 내용을 정리. 핵심 내용들을 각각 넘버링하고 하위 불릿포인트로 정리하여 요약과 이해가 쉽도록 구성
 
-## 📌 결론
-### 결론: {topic} 논쟁의 핵심과 전망
+## 📌 결론: ((핵심 주제))의 핵심과 전망
 
 300~400자 내외
+
+---
+
+## 참고 자료
+
+### 📰 전체 내용 참고 뉴스
+- [뉴스 제목](뉴스 URL)
+- [뉴스 제목](뉴스 URL)
+
+### 🎯 진영별 입장 참고 뉴스
+- [뉴스 제목](뉴스 URL)
+- [뉴스 제목](뉴스 URL)
         """.strip()
         
         # 평가 기준 정의
@@ -67,7 +83,7 @@ class PromptGenerator:
         """.strip()
     
 
-    def get_draft_prompt_with_news(self, topic: str, news_summary: str) -> str:
+    def get_draft_prompt_with_news(self, topic: str, news_summary: str, news_sources=None) -> str:
         """
         뉴스 정보를 포함한 초안 생성 프롬프트
         
@@ -83,11 +99,18 @@ class PromptGenerator:
         # 템플릿에 주제 적용
         formatted_template = self.template.format(topic=topic)
         
+        # 뉴스 소스 정보 포맷팅
+        sources_text = ""
+        if news_sources:
+            sources_text = "\n\n[참고 뉴스 소스]\n"
+            for i, source in enumerate(news_sources, 1):
+                sources_text += f"{i}. [{source.get('title', 'N/A')}]({source.get('link', source.get('url', '#'))})\n"
+        
         return f"""
 다음 최신 뉴스 정보를 바탕으로 '{topic}'에 대한 컬럼 콘텐츠를 작성해주세요.
 
 [최신 뉴스 정보]
-{news_summary}
+{news_summary}{news_sources}{sources_text}
 
 [작성 규칙]
 {self.writing_rules}
@@ -97,6 +120,12 @@ class PromptGenerator:
 
 **중요**: 위 뉴스 정보를 활용하여 최신 동향과 구체적인 사실을 반영한 컬럼을 작성해주세요.
 반드시 진보와 보수 진영의 입장은 실제 뉴스에서 언급된 내용을 바탕으로 작성해주세요.
+
+**뉴스 링크 참조 요구사항**:
+- 컬럼의 맨 마지막에 "## 참고 자료" 섹션을 반드시 추가하세요.
+- "### 📰 전체 내용 참고 뉴스"와 "### 🎯 진영별 입장 참고 뉴스"로 구분하여 링크를 표기하세요.
+- 각 링크는 [뉴스 제목](뉴스 URL) 형식으로 작성하세요.
+- 전체 내용에 사용된 뉴스와 특정 진영 입장에 사용된 뉴스를 구분해서 표기하세요.
         """.strip()
 
     def get_revision_prompt(self, content: str) -> str:
@@ -142,8 +171,8 @@ class PromptGenerator:
 {content}
 
 요구사항:
-- 제목: 10-50자, 흥미롭고 내용을 잘 표현
-- 요약: 50-200자, 핵심 내용을 간결하게 정리
+- 제목: 흥미롭고 내용을 잘 표현
+- 요약: 핵심 내용을 간결하게 정리
 
 JSON 형식으로 응답해주세요:
 {{

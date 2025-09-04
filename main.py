@@ -132,18 +132,41 @@ async def generate_column(request: Request, column_request: ColumnRequest):
         word_count = len(article_content.content.replace(" ", ""))
         created_date = datetime.utcnow().isoformat() + "Z"
         
+        # 요약 길이 가드(<=300자). 초과 시 말줄임표 추가
+        safe_summary = article_content.summary
+        if isinstance(safe_summary, str) and len(safe_summary) > 300:
+            safe_summary = (safe_summary[:297]).rstrip() + "..."
+
+        # Source 모델 입력 정규화 (테스트에서 MagicMock을 반환해도 dict로 변환)
+        normalized_sources = None
+        if getattr(article_content, "sources", None):
+            normalized_sources = []
+            for s in article_content.sources:
+                try:
+                    if isinstance(s, dict):
+                        normalized_sources.append({
+                            "title": s.get("title", ""),
+                            "uri": s.get("uri", "")
+                        })
+                    else:
+                        title = getattr(s, "title", "")
+                        uri = getattr(s, "uri", "")
+                        normalized_sources.append({"title": title, "uri": uri})
+                except Exception:
+                    continue
+
         # 응답 데이터 구성
         response = ColumnResponse(
             success=True,
             article=ArticleData(
                 title=article_content.title,
-                summary=article_content.summary,
+                summary=safe_summary,
                 content=article_content.content,
                 metadata=MetaData(
                     wordCount=word_count,
                     category="정치",
                     createdDate=created_date,
-                    sources=article_content.sources
+                    sources=normalized_sources
                 )
             ),
             processedDate=created_date

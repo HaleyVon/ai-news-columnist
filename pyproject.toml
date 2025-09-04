@@ -80,7 +80,7 @@ requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ai-political-columnist"
+name = "ai-news-columnist"
 version = "1.0.0"
 description = "AI 정치 컬럼니스트 - FastAPI 기반 정치 컬럼 생성 서비스"
 authors = [
@@ -124,6 +124,6 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/example/ai-political-columnist"
-Repository = "https://github.com/example/ai-political-columnist.git"
-Issues = "https://github.com/example/ai-political-columnist/issues"
+Homepage = "https://github.com/ai-news-columnist"
+Repository = "https://github.com//ai-news-columnist.git"
+Issues = "https://github.com/ai-news-columnist/issues"

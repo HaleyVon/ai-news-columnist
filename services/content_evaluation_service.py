@@ -31,7 +31,7 @@ class ContentEvaluationService:
         self.client = AsyncOpenAI(api_key=self.api_key)
         
         # 평가용 모델 설정 (일관성을 위해 낮은 temperature)
-        self.model = "gpt-4o-mini"
+        self.model = "gpt-4.1-mini"
         
         self.prompt_generator = PromptGenerator()
     
@@ -66,7 +66,7 @@ class ContentEvaluationService:
                 ],
                 response_format={"type": "json_object"},
                 temperature=0.3,  # 평가 일관성을 위해 낮은 temperature
-                max_tokens=4000
+                max_completion_tokens=4000
             )
             
             if not response.choices or not response.choices[0].message.content:
