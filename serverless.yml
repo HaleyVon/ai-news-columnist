@@ -1,0 +1,147 @@
+# Serverless Framework 설정 파일
+# AWS Lambda 배포를 위한 설정
+
+service: ai-political-columnist
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: ${opt:region, 'ap-northeast-2'}  # 서울 리전 기본값
+  stage: ${opt:stage, 'dev'}
+  timeout: 300  # 5분 (외부 AI API 호출 고려)
+  memorySize: 1024  # 1GB (AI API 호출 및 처리를 위한 충분한 메모리)
+  
+  # 환경 변수 설정
+  environment:
+    ENVIRONMENT: ${self:provider.stage}
+    OPENAI_API_KEY: ${env:OPENAI_API_KEY}
+    LAMBDA_TIMEOUT: 300
+    LAMBDA_MEMORY_SIZE: 1024
+    RATE_LIMIT_PER_MINUTE: 5
+    MAX_REQUEST_SIZE: 1048576
+  
+  # IAM 역할 설정
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: 
+            - 'arn:aws:logs:${self:provider.region}:*:*'
+
+# Lambda 함수 정의
+functions:
+  api:
+    handler: main.handler
+    description: "AI 정치 컬럼니스트 API 핸들러"
+    events:
+      - http:
+          path: /{proxy+}
+          method: any
+          cors:
+            origin: 
+              - https://ai.studio
+              - https://localhost:3000
+              - http://localhost:3000
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Requested-With
+            allowCredentials: true
+    layers:
+      - ${self:custom.pythonRequirementsLayer}
+
+# 커스텀 설정
+custom:
+  # Python Requirements Layer
+  pythonRequirements:
+    dockerizePip: true
+    slim: true
+    strip: false
+    noDeps: false
+    pipCmdExtraArgs:
+      - --no-cache-dir
+    layer:
+      name: ${self:service}-${self:provider.stage}-requirements
+      description: "Python requirements layer"
+      compatibleRuntimes:
+        - python3.11
+      retain: false
+  
+  pythonRequirementsLayer:
+    Ref: PythonRequirementsLambdaLayer
+
+# 플러그인 설정
+plugins:
+  - serverless-python-requirements
+
+# 패키지 설정 (배포 최적화)
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!.git/**'
+    - '!.pytest_cache/**'
+    - '!tests/**'
+    - '!.env*'
+    - '!*.md'
+    - '!.gitignore'
+    - '!.github/**'
+    - '!vite.config.ts'
+    - '!tsconfig.json'
+    - '!package*.json'
+    - '!*.tsx'
+    - '!*.ts'
+    - '!components/**'
+    - '!index.html'
+    - '!constants.ts'
+    - '!types.ts'
+    - '!App.tsx'
+    - '!index.tsx'
+    - '!metadata.json'
+
+# CloudFormation 리소스 (선택사항)
+resources:
+  Resources:
+    # API Gateway 설정
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Requested-With'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'RestApiApigEvent'
+    
+    GatewayResponseDefault5XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,Authorization,X-Requested-With'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+        ResponseType: DEFAULT_5XX
+        RestApiId:
+          Ref: 'RestApiApigEvent'
+
+# 출력 정보
+outputs:
+  ApiGatewayRestApiId:
+    Value:
+      Ref: RestApiApigEvent
+    Export:
+      Name: ${self:service}-${self:provider.stage}-RestApiId
+  
+  ApiGatewayRestApiRootResourceId:
+    Value:
+      Fn::GetAtt:
+        - RestApiApigEvent
+        - RootResourceId
+    Export:
+      Name: ${self:service}-${self:provider.stage}-RootResourceId

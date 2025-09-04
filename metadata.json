@@ -1,0 +1,5 @@
+{
+  "name": "AI Political Columnist",
+  "description": "An AI agent that analyzes news topics from both progressive and conservative viewpoints and automatically generates a standardized, neutral news column.",
+  "requestFramePermissions": []
+}

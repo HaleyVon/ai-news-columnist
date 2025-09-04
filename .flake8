@@ -1,0 +1,40 @@
+[flake8]
+# Flake8 린트 설정
+max-line-length = 88
+max-complexity = 10
+select = E,W,F,C
+ignore = 
+    # E203: whitespace before ':' (Black과 충돌)
+    E203,
+    # W503: line break before binary operator (Black과 충돌)
+    W503,
+    # F401: imported but unused (일부 __init__.py 파일에서 필요)
+    # F401
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    .eggs,
+    *.egg,
+    build,
+    dist,
+    .pytest_cache,
+    .mypy_cache,
+    htmlcov,
+    node_modules,
+    components,
+    *.tsx,
+    *.ts,
+    *.js
+
+# 특정 오류 코드에 대한 허용
+per-file-ignores =
+    # __init__.py 파일에서는 F401 (unused import) 허용
+    __init__.py:F401
+    # 테스트 파일에서는 복잡도 제한 완화
+    tests/*:C901
+
+# 프로젝트별 설정
+application-import-names = main,core,services,schemas,middleware
+import-order-style = google
