@@ -53,11 +53,18 @@ AI 정치 컬럼니스트는 **OpenAI gpt-4.1-mini API**를 활용하여 정치�
 - OpenAI gpt-4.1-mini 모델 활용
 - 다단계 품질 검증 프로세스
 - 자동 제목/요약 생성
+- 마크다운 형식 출력 (##, ###, **강조**)
 
 ### 📊 다중 관점 분석
 - 진보적 관점과 보수적 관점 균형 반영
+- 정치 진영별 키워드 기반 자동 분류
 - 객관적 분석과 논증 구조 제공
 - 최신 뉴스 데이터 기반 정보 제공
+
+### 📰 팩트 체크 지원
+- 뉴스 링크 참조 시스템 (전체 내용 vs 진영별 입장 구분)
+- 검색된 뉴스 소스 자동 링크 표기
+- 관리자 팩트 체크를 위한 참고자료 섹션
 
 ### 🛡️ 강력한 보안
 - Rate Limiting (분당 5회 제한)
@@ -91,7 +98,7 @@ AI 정치 컬럼니스트는 **OpenAI gpt-4.1-mini API**를 활용하여 정치�
 
 ### 1️⃣ 저장소 클론
 ```bash
-git clone https://github.com/your-username/ai-news-columnist.git
+git clone https://github.com/HaleyVon/ai-news-columnist
 cd ai-news-columnist
 ```
 
@@ -208,7 +215,7 @@ curl -X POST "http://localhost:8000/api/generate-column" \\
   "article": {
     "title": "2024 대선 여론조사가 보여주는 민심의 변화",
     "summary": "최근 여론조사 결과를 통해 본 유권자 동향과 정치적 함의를 균형있게 분석",
-    "content": "...전체 컬럼 내용...",
+    "content": "## 2024 대선 여론조사가 보여주는 민심의 변화\n\n최근 여론조사 결과를 통해...\n\n## 💬 여론조사에 대한 진영별 입장\n\n### 🔵 진보 진영 입장\n- 첫 번째 입장...\n\n### 🔴 보수 진영 입장\n- 첫 번째 입장...\n\n## 🧨 여론조사 분석의 핵심\n\n### 주요 변화 추이\n...\n\n## 📌 결론: 여론조사의 정치적 함의\n\n...\n\n---\n\n## 참고 자료\n\n### 📰 전체 내용 참고 뉴스\n- [중앙선거여론조사심의위원회 공식 발표](https://example.com/poll-results)\n\n### 🎯 진영별 입장 참고 뉴스\n- [민주당 대변인 논평](https://example.com/democratic-response)\n- [국민의힘 원내대표 발언](https://example.com/conservative-response)",
     "metadata": {
       "wordCount": 1547,
       "category": "정치",
@@ -512,8 +519,10 @@ ai-news-columnist/
 ### Git 브랜치 전략
 ```bash
 # 메인 브랜치
-main          # 프로덕션 배포용
-develop       # 개발 통합 브랜치
+master   #운영
+dev      #개발
+feature  #개발자들의 개개인 이슈 처리
+hotfix   #운영 중 급한 업무
 
 # 기능 개발
 feature/컬럼생성개선    # 새 기능 개발
@@ -557,11 +566,9 @@ refactor: 프롬프트 생성 로직 개선
 
 <div align="center">
 
-**⭐ 이 프로젝트가 도움이 되었다면 스타를 눌러주세요! ⭐**
 
 ---
 
-*Made with ❤️ by AI Political Columnist Team*  
-*© 2024 AI Political Columnist. MIT License.*
+*Made with ❤️ by DLTO Team*  
 
 </div>
