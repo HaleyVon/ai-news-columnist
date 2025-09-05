@@ -141,7 +141,30 @@ make sam-deploy-dev     # Alternative SAM deployment
 ## Testing Strategy
 
 - **Unit Tests**: Fast, isolated tests for individual components
-- **Integration Tests**: API endpoint testing with mocked external services
+- **Integration Tests**: API endpoint testing with mocked external services  
 - **Test Fixtures**: Reusable test data and mock services in conftest.py
 - **Coverage Targets**: 80% minimum code coverage requirement
 - **Async Testing**: pytest-asyncio for testing async service methods
+- **Test Markers**: Use `pytest -m unit` or `pytest -m integration` to run specific test types
+
+## Important Architecture Notes
+
+### Service Layer Organization
+The service layer follows a modular approach with distinct responsibilities:
+
+- **GeminiService**: Main orchestrator service that coordinates content generation pipeline
+- **ContentGenerationService**: Handles OpenAI API calls and content creation
+- **ContentEvaluationService**: Evaluates content quality with 5-dimension scoring
+- **NaverNewsSearchService**: Integrates with Naver News API for real-time news data
+
+### API Endpoint Architecture
+- **POST /api/generate-column**: Direct column generation (bypasses preview)
+- **POST /api/preview-news**: News search preview with caching mechanism
+- **POST /api/generate-column-confirmed**: Generate column using cached news data
+
+The preview-confirm pattern prevents redundant API calls and allows users to verify news quality before generation.
+
+### Error Handling Pattern
+- Custom exceptions in `core/exceptions.py` provide structured error responses
+- All exceptions are caught and converted to consistent JSON error format
+- Sensitive error details are sanitized for security

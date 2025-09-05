@@ -73,7 +73,11 @@ class ContentEvaluationService:
                 raise ContentGenerationException("평가 API가 빈 응답을 반환했습니다.")
             
             # JSON 응답 파싱
-            evaluation_data = json.loads(response.choices[0].message.content)
+            raw_response = response.choices[0].message.content
+            logger.debug(f"원본 평가 응답: {raw_response}")
+            
+            evaluation_data = json.loads(raw_response)
+            logger.debug(f"파싱된 평가 데이터: {evaluation_data}")
             
             # EvaluationResult 객체 생성
             result = self._parse_evaluation_result(evaluation_data)
@@ -101,14 +105,42 @@ class ContentEvaluationService:
             EvaluationResult: 파싱된 평가 결과
         """
         try:
-            # 점수 정보 추출
+            # 점수 정보 추출 (API 응답 형태에 맞춰 유연하게 처리)
             scores_data = evaluation_data.get("scores", {})
+            
+            # OpenAI가 실제로 반환하는 키들을 체크
+            logger.debug(f"받은 점수 키들: {list(scores_data.keys())}")
+            
             scores = {
-                "format": scores_data.get("format", 0),
-                "balance": scores_data.get("balance", 0), 
-                "readability": scores_data.get("readability", 0),
-                "completeness": scores_data.get("completeness", 0),
-                "objectivity": scores_data.get("objectivity", 0)
+                "format": (
+                    scores_data.get("format", 0) or
+                    scores_data.get("Format Compliance", 0) or
+                    scores_data.get("format_compliance", 0)
+                ),
+                "balance": (
+                    scores_data.get("balance", 0) or 
+                    scores_data.get("Balance", 0) or
+                    scores_data.get("Content Quality", 0) or  # API가 하나로 통합해서 반환하는 경우
+                    0
+                ),
+                "readability": (
+                    scores_data.get("readability", 0) or
+                    scores_data.get("Readability", 0) or
+                    scores_data.get("Content Quality", 0) or  # API가 하나로 통합해서 반환하는 경우
+                    0
+                ),
+                "completeness": (
+                    scores_data.get("completeness", 0) or
+                    scores_data.get("Completeness", 0) or
+                    scores_data.get("Content Quality", 0) or  # API가 하나로 통합해서 반환하는 경우
+                    0
+                ),
+                "objectivity": (
+                    scores_data.get("objectivity", 0) or
+                    scores_data.get("Objectivity", 0) or
+                    scores_data.get("Content Quality", 0) or  # API가 하나로 통합해서 반환하는 경우
+                    0
+                )
             }
             
             # 통과 여부 확인

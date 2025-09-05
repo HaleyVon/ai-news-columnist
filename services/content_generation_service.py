@@ -127,11 +127,11 @@ class ContentGenerationService:
         
         for i, item in enumerate(news_data[:10], 1):  # 최대 10개만 사용
             news_text = f"""
-[뉴스 {i}] {item.get('title', 'N/A')}
-- 내용: {item.get('description', 'N/A')}
-- 발행일: {item.get('pubDate', 'N/A')}
-- 출처: {item.get('originalLink', item.get('link', 'N/A'))}
-"""
+                [뉴스 {i}] {item.get('title', 'N/A')}
+                - 내용: {item.get('description', 'N/A')}
+                - 발행일: {item.get('pubDate', 'N/A')}
+                - 출처: {item.get('originalLink', item.get('link', 'N/A'))}
+                """
             formatted_news.append(news_text.strip())
         
         formatted_result = "\n\n".join(formatted_news)

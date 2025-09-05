@@ -61,10 +61,11 @@ AI 정치 컬럼니스트는 **OpenAI gpt-4.1-mini API**를 활용하여 정치�
 - 객관적 분석과 논증 구조 제공
 - 최신 뉴스 데이터 기반 정보 제공
 
-### 📰 팩트 체크 지원
-- 뉴스 링크 참조 시스템 (전체 내용 vs 진영별 입장 구분)
+### 📰 뉴스 검색 및 미리보기
+- 네이버 뉴스 API 연동으로 실시간 뉴스 검색
+- 뉴스 미리보기 및 품질 평가 시스템
+- 캐싱 메커니즘을 통한 효율적인 API 사용
 - 검색된 뉴스 소스 자동 링크 표기
-- 관리자 팩트 체크를 위한 참고자료 섹션
 
 ### 🛡️ 강력한 보안
 - Rate Limiting (분당 5회 제한)
@@ -198,13 +199,41 @@ curl http://localhost:8000/health
 }
 ```
 
-### 정치 컬럼 생성 요청
+### API 엔드포인트 상세
+
+#### 1️⃣ 뉴스 미리보기 (권장 워크플로우)
+```bash
+curl -X POST "http://localhost:8000/api/preview-news" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "topic": "나경원 추미애",
+    "daysBack": 7,
+    "searchMode": "title"
+  }'
+```
+
+#### 2️⃣ 뉴스 확인 후 컬럼 생성
+```bash
+curl -X POST "http://localhost:8000/api/generate-column-confirmed" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "topic": "나경원 추미애",
+    "daysBack": 7,
+    "searchMode": "title",
+    "maxRevisionAttempts": 3,
+    "proceed": true
+  }'
+```
+
+#### 3️⃣ 직접 컬럼 생성 (미리보기 생략)
 ```bash
 curl -X POST "http://localhost:8000/api/generate-column" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "topic": "최근 대선 여론조사 결과에 대한 분석",
-    "maxRevisionAttempts": 3
+    "topic": "나경원 추미애",
+    "maxRevisionAttempts": 3,
+    "daysBack": 7,
+    "searchMode": "title"
   }'
 ```
 
@@ -233,10 +262,41 @@ curl -X POST "http://localhost:8000/api/generate-column" \\
 ```
 
 ### 요청 파라미터 상세
+
+#### 공통 파라미터
 | 필드 | 타입 | 필수 | 설명 | 예시 |
 |------|------|------|------|------|
 | `topic` | string | ✅ | 컬럼 주제 (2-200자) | "부동산 정책 변화 분석" |
+| `daysBack` | number | ❌ | 뉴스 검색 기간 (1-30일) | 7 (기본값) |
+| `searchMode` | string | ❌ | 검색 범위 | "title" (기본값) 또는 "all" |
 | `maxRevisionAttempts` | number | ❌ | 최대 수정 횟수 (1-5) | 3 (기본값) |
+
+#### 컬럼 생성 확인 전용
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `proceed` | boolean | ✅ | 컬럼 생성 진행 여부 |
+
+#### 뉴스 미리보기 응답 예시
+```json
+{
+  "success": true,
+  "topic": "나경원 추미애",
+  "searchPeriod": 7,
+  "newsCount": 3,
+  "newsItems": [
+    {
+      "title": "나경원 국민의힘 의원, 정치적 발언으로 논란",
+      "description": "나경원 의원이 최근 발언에 대해 추미애 전 법무부 장관이 반박했다.",
+      "pubDate": "2024-01-15",
+      "originalLink": "https://news.example.com/article1"
+    }
+  ],
+  "totalAvailable": 15,
+  "searchQuality": "good",
+  "recommendation": "양호한 뉴스 데이터(15개)입니다. 컬럼 생성을 진행할 수 있습니다.",
+  "processedDate": "2024-01-15T10:30:45Z"
+}
+```
 
 ---
 
@@ -485,8 +545,11 @@ ai-news-columnist/
 │
 ├── 📁 services/               # 비즈니스 로직 서비스
 │   ├── 📄 __init__.py
-│   ├── 📄 gemini_service.py   # OpenAI API 연동 (파일명 유지)
-│   └── 📄 prompts.py          # AI 프롬프트 관리
+│   ├── 📄 gemini_service.py           # 통합 서비스 (OpenAI API 연동)
+│   ├── 📄 content_generation_service.py # 컨텐츠 생성 서비스
+│   ├── 📄 content_evaluation_service.py # 품질 평가 서비스
+│   ├── 📄 news_search_service.py        # 네이버 뉴스 검색 서비스
+│   └── 📄 prompts.py                    # AI 프롬프트 관리
 │
 ├── 📁 middleware/             # 미들웨어
 │   ├── 📄 __init__.py
@@ -495,7 +558,8 @@ ai-news-columnist/
 ├── 📁 tests/                  # 테스트 코드
 │   ├── 📄 __init__.py
 │   ├── 📄 conftest.py         # pytest 설정 및 픽스처
-│   └── 📄 test_main.py        # 메인 API 테스트
+│   ├── 📄 test_main.py        # 메인 API 테스트
+│   └── 📄 test_summary_guard.py # 요약 길이 제한 테스트
 │
 └── 📁 venv/                   # Python 가상환경 (gitignore)
 ```
@@ -506,7 +570,10 @@ ai-news-columnist/
 |---------------|------|-----------|
 | `main.py` | FastAPI 앱 설정, 라우터, 미들웨어 | 🟡 보통 |
 | `schemas.py` | API 요청/응답 데이터 모델 | 🟡 보통 |
-| `services/gemini_service.py` | AI 컬럼 생성 핵심 로직 (OpenAI 사용) | 🔴 높음 |
+| `services/gemini_service.py` | 통합 서비스 조정자 (OpenAI + 네이버 API) | 🔴 높음 |
+| `services/content_generation_service.py` | OpenAI API 호출 및 컨텐츠 생성 | 🔴 높음 |
+| `services/content_evaluation_service.py` | 품질 평가 및 반복 개선 로직 | 🟡 보통 |
+| `services/news_search_service.py` | 네이버 뉴스 API 연동 | 🟡 보통 |
 | `services/prompts.py` | AI 프롬프트 템플릿 | 🔴 높음 |
 | `core/config.py` | 환경설정 관리 | 🟢 낮음 |
 | `tests/` | 자동화된 테스트 코드 | 🟡 보통 |

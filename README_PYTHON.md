@@ -5,7 +5,10 @@ OpenAI gpt-4.1-mini API를 활용한 정치 컬럼 생성 서비스입니다. Fa
 ## 🚀 주요 기능
 
 - **AI 기반 정치 컬럼 생성**: OpenAI gpt-4.1-mini API를 활용한 고품질 컬럼 생성
+- **마크다운 형식 출력**: ##, ###, **강조** 및 이모지를 활용한 구조화된 컬럼
 - **다중 관점 분석**: 진보/보수 관점을 균형있게 반영
+- **정치 진영 자동 분류**: 키워드 기반 진보/보수 진영별 입장 분류
+- **팩트 체크 지원**: 뉴스 링크 참조 시스템으로 관리자 팩트체크 지원
 - **품질 보증 시스템**: 자동 평가 및 반복 개선 프로세스
 - **RESTful API**: JSON 기반 API 엔드포인트 제공
 - **AWS Lambda 최적화**: 서버리스 환경에 최적화된 구조
@@ -78,7 +81,7 @@ python main.py
 curl -X POST \"http://localhost:8000/api/generate-column\" \\
   -H \"Content-Type: application/json\" \\
   -d '{
-    \"topic\": \"최근 대선 여론조사 결과 분석\",
+    \"topic\": \"나경원 추미애\",
     \"maxRevisionAttempts\": 3
   }'
 ```
@@ -90,7 +93,7 @@ curl -X POST \"http://localhost:8000/api/generate-column\" \\
   \"article\": {
     \"title\": \"2024 대선 여론조사, 무엇을 말하는가?\",
     \"summary\": \"최근 여론조사 결과를 통해 본 유권자 동향과 정치적 함의\",
-    \"content\": \"...전체 컬럼 내용...\",
+    \"content\": \"## 2024 대선 여론조사, 무엇을 말하는가?\\n\\n최근 여론조사 결과를 통해...\\n\\n## 💬 여론조사에 대한 진영별 입장\\n\\n### 🔵 진보 진영 입장\\n- 여론조사는 현 정부 정책에 대한 국민 불만을 반영한다.\\n- 경제 민생 정책의 실패가 수치로 나타났다.\\n- 정책 변화의 필요성이 확인되었다.\\n\\n### 🔴 보수 진영 입장\\n- 일시적 현상으로 장기적 지지율과는 다르다.\\n- 국정 운영 성과가 점진적으로 나타날 것이다.\\n- 언론의 편향 보도가 여론에 영향을 미쳤다.\\n\\n## 🧨 여론조사 분석의 핵심\\n\\n### 주요 변화 추이\\n1. 지지율 변동 패턴\\n2. 연령별 선호도 차이\\n3. 지역별 정치 성향\\n\\n## 📌 결론: 여론조사의 정치적 함의\\n\\n...\\n\\n---\\n\\n## 참고 자료\\n\\n### 📰 전체 내용 참고 뉴스\\n- [중앙선거여론조사심의위원회 결과](https://example.com/poll-results)\\n\\n### 🎯 진영별 입장 참고 뉴스\\n- [민주당 대변인 논평](https://example.com/democratic-response)\\n- [국민의힘 원내대표 발언](https://example.com/conservative-response)\",
     \"metadata\": {
       \"wordCount\": 1250,
       \"category\": \"정치\",
@@ -296,16 +299,3 @@ ai-news-columnist/
 4. 브랜치 Push (`git push origin feature/새기능`)
 5. Pull Request 생성
 
-## 📄 라이센스
-
-이 프로젝트는 MIT 라이센스 하에 있습니다. 자세한 내용은 LICENSE 파일을 참조하세요.
-
-## 🙋‍♂️ 지원
-
-- **Issues**: GitHub Issues를 통해 버그 리포트나 기능 요청
-- **Discussions**: 일반적인 질문이나 토론
-- **Documentation**: 추가 문서는 `/docs` 폴더 참조
-
----
-
-**참고**: 이 서비스는 교육 및 데모 목적으로 제작되었습니다. 실제 운영 환경에서 사용하기 전에 보안 검토를 받으시기 바랍니다.

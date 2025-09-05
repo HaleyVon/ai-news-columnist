@@ -31,7 +31,7 @@ class PromptGenerator:
         
         # 템플릿 정의 (마크다운 형식)
         self.template = """
-## 주제를 잘 드러내며 흥미를 유발하는 중립적인 제목
+## 핵심 내용을 잘 드러내며 흥미를 유발하는 중립적인 제목, 뉴스에서 가장 많이 언급된 키워드들을 활용
 
 핵심 내용을 요약하여 최대 300자 이내로 간결하게 작성
 
@@ -145,10 +145,29 @@ class PromptGenerator:
 {self.evaluation_criteria}
 
 [평가 프로세스]
-1. 각 항목을 0점에서 100점 사이로 채점합니다.
+1. 다음 5개 항목을 각각 0-100점으로 채점합니다:
+   - format: 양식 준수 점수 
+   - balance: 균형성 점수
+   - readability: 가독성 점수
+   - completeness: 완성도 점수  
+   - objectivity: 객관성 점수
 2. 모든 항목의 점수가 85점 이상이면 'pass'를 true로 설정합니다. 하나라도 85점 미만이면 'pass'를 false로 설정합니다.
 3. 'pass'가 false일 경우, 가장 점수가 낮은 항목을 중심으로 구체적인 개선 방향을 'feedback'에 작성합니다. 'pass'가 true일 경우, 칭찬의 말을 'feedback'에 작성합니다.
 4. 'feedback'을 바탕으로 원고를 수정하여 'revisedContent'에 담아주세요. 만약 'pass'가 true라면, 원본 원고를 그대로 'revisedContent'에 담아주세요.
+
+**반드시 아래 JSON 형식으로 응답해주세요:**
+{{
+  "scores": {{
+    "format": 85,
+    "balance": 90,
+    "readability": 88,
+    "completeness": 92,
+    "objectivity": 89
+  }},
+  "pass": true,
+  "feedback": "구체적인 피드백 메시지",
+  "revisedContent": "수정된 원고 전체 내용"
+}}
 
 [컬럼 원고]
 {content}
